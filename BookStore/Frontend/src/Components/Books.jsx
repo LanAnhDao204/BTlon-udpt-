@@ -33,7 +33,7 @@ const Books = () => {
             const userInfo = localStorage.getItem("User");
             if (!userInfo) return;
             
-            const userId = JSON.parse(userInfo)._id;
+            const userId = JSON.parse(userInfo).id; // Changed from _id to id
             const res = await axios.get(
                 `${API_URL}/user/profile/${userId}`
             );
@@ -66,7 +66,7 @@ const Books = () => {
                 </div>
                 <div className='mt-12 grid grid-cols-1 md:grid-cols-2  lg:grid-cols-4 gap-4'>
                     {books.map((item) => (
-                        <Card key={item._id} item={item} />
+                        <Card key={item.id} item={item} /> // Changed from item._id to item.id
                     ))}
                 </div>
             </div>

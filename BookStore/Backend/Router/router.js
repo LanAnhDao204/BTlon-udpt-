@@ -10,6 +10,7 @@ import editBook from '../Controllers/editBook.js';
 import addBook from '../Controllers/addBook.js';
 import getBook from '../Controllers/getBook.js';
 import readBook from '../Controllers/readBook.js';
+import searchBook from '../Controllers/searchBook.js';
 
 
 const router = express.Router();
@@ -27,5 +28,6 @@ router.get('/book/read/:id',readBook)
 router.get('/book/:id',getBook)
 router.put('/book/:id',editBook)
 router.delete('/book/:id',deleteBook)
+router.get('/books/search', searchBook)
 
 export default router

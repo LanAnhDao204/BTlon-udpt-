@@ -53,7 +53,7 @@ const RecentBooks = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {getAllBooks().map(book => (
-            <Card key={book._id} item={book} />
+            <Card key={book.id} item={book} />
           ))}
         </div>
       </div>
@@ -65,7 +65,7 @@ const RecentBooks = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {getBooksByCategory('Fiction').map(book => (
-              <Card key={book._id} item={book} />
+              <Card key={book.id} item={book} />
             ))}
           </div>
         </div>
@@ -78,7 +78,7 @@ const RecentBooks = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {getBooksByCategory('Science').map(book => (
-              <Card key={book._id} item={book} />
+              <Card key={book.id} item={book} />
             ))}
           </div>
         </div>
@@ -91,7 +91,7 @@ const RecentBooks = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {getBooksByCategory('Poetry').map(book => (
-              <Card key={book._id} item={book} />
+              <Card key={book.id} item={book} />
             ))}
           </div>
         </div>
@@ -100,4 +100,4 @@ const RecentBooks = () => {
   );
 };
 
-export default RecentBooks; 
+export default RecentBooks;

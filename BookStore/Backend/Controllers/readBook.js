@@ -1,17 +1,13 @@
-import neo4j from 'neo4j-driver';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const driver = neo4j.driver(
-    'bolt://localhost:7687',
-    neo4j.auth.basic('neo4j', process.env.NEO4J_PASSWORD || 'thang044')
-);
+import driver from '../Database/dbconnection.js';
 
 const readBook = async (req, res) => {
-    const session = driver.session({ defaultAccessMode: neo4j.session.READ });
+    const session = driver.session();
     try {
         const { id } = req.params;
+        
+        if (!id) {
+            return res.status(400).json({ message: 'Book ID is required' });
+        }
 
         const result = await session.run(
             'MATCH (b:Book {id: $id}) RETURN b',
@@ -32,7 +28,8 @@ const readBook = async (req, res) => {
             image: book.image,
             title: book.title,
             description: book.description,
-            content: book.content
+            content: book.content,
+            link: book.link
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

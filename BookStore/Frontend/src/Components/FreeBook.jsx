@@ -94,11 +94,11 @@ const FreeBook = () => {
                             <Slider {...settings}>
                                 {filterData.length > 0 ? (
                                     filterData.map((item) => (
-                                        <Card item={item} key={item._id} />
+                                        <Card item={item} key={item.id} />
                                     ))
                                 ) : (
                                     freebooks.slice(0, 3).map((item) => (
-                                        <Card item={item} key={item._id} />
+                                        <Card item={item} key={item.id} />
                                     ))
                                 )}
                             </Slider>

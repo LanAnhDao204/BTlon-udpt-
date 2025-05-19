@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import { useAuth } from "./Context/Authprovider";
 import ProfilePage from "./Pages/ProfilePage";
 import ReadBook from "./Components/ReadBook";
+import SearchResults from "./Components/SearchResults";
 
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/search" element={<SearchResults />} />
         </Routes>
         <Toaster />
       </div>

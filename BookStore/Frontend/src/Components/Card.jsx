@@ -16,7 +16,7 @@ const Card = ({ item }) => {
         const userInfo = localStorage.getItem("User");
         if (!userInfo) return;
         
-        const userId = JSON.parse(userInfo)._id;
+        const userId = JSON.parse(userInfo).id; // Changed from _id to id
         const res = await axios.get(
           `${API_URL}/user/profile/${userId}`
         );
@@ -46,7 +46,7 @@ const Card = ({ item }) => {
           </figure>
           <div className="card-body">
           {admin &&
-                <p className="text-sm text-pink-500">id: {item._id}</p>
+                <p className="text-sm text-pink-500">id: {item.id}</p> // Changed from item._id to item.id
                 }
             <h2 className="card-title">
               {item.name}
@@ -57,7 +57,7 @@ const Card = ({ item }) => {
               <div className="badge badge-outline p-4 cursor-pointer hover:bg-pink-500 duration-200 hover:text-black">{item.lang}</div>
               <div className="flex space-x-2">
                 <Link
-                  to={`/read/${item._id}`}
+                  to={`/read/${item.id}`} // Changed from item._id to item.id
                   className="badge badge-outline p-4 cursor-pointer hover:bg-pink-500 duration-200 hover:text-black">
                   Read Online
                 </Link>

@@ -1,9 +1,4 @@
-import neo4j from 'neo4j-driver';
-
-const driver = neo4j.driver(
-    'bolt://localhost:7687',
-    neo4j.auth.basic('neo4j', 'thang044')
-);
+import driver from '../Database/dbconnection.js';
 
 const userlogin = async (req, res) => {
     const session = driver.session();
@@ -30,6 +25,7 @@ const userlogin = async (req, res) => {
         res.status(200).json({
             message: 'Login Successful',
             user: {
+                id: userNode.id, // Include id in the response
                 name: userNode.name,
                 email: userNode.email,
                 image: userNode.image,

@@ -1,17 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/Authprovider";
 import Logout from "./Logout";
-// import Logout from "./Logout";
 
 
 const Navbar = () => {
-
     const [auth] = useAuth();
-
-    const [theme, setTheme] = useState("dark")
+    const [theme, setTheme] = useState("dark");
     const element = document.documentElement;
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
 
     useEffect(()=>{
         if(theme === 'dark'){
@@ -26,7 +25,12 @@ const Navbar = () => {
         }
     },[theme])
 
-
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+        }
+    };
 
     const [sticky , setSticky] = useState(false);
     useEffect(()=>{
@@ -87,24 +91,29 @@ const Navbar = () => {
                         </div>
 
                         <div className="hidden md:block">
-                            <label className="px-3 py-2 border rounded-md flex items-center gap-2">
+                            <form onSubmit={handleSearch} className="px-3 py-2 border rounded-md flex items-center gap-2">
                                 <input 
-                                type="text" 
-                                className={`grow outline-none dark:text-white duration-300
-                                ${sticky?`dark:bg-slate-800`:`dark:bg-slate-900`}
-                                `}
-                                placeholder="Tìm kiếm" />
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 16 16"
-                                    fill="currentColor"
-                                    className="h-4 w-4 opacity-70">
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                                        clipRule="evenodd" />
-                                </svg>
-                            </label>
+                                    type="text" 
+                                    className={`grow outline-none dark:text-white duration-300
+                                    ${sticky?`dark:bg-slate-800`:`dark:bg-slate-900`}
+                                    `}
+                                    placeholder="Tìm kiếm" 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                <button type="submit">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 16 16"
+                                        fill="currentColor"
+                                        className="h-4 w-4 opacity-70">
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                                            clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                         <div className="theme-controller">
                             <label className="swap swap-rotate">

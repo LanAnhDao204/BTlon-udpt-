@@ -1,9 +1,4 @@
-import neo4j from 'neo4j-driver';
-
-const driver = neo4j.driver(
-    'bolt://localhost:7687',
-    neo4j.auth.basic('neo4j', 'thang044')
-);
+import driver from '../Database/dbconnection.js';
 
 const usersignup = async (req, res) => {
     const session = driver.session();
@@ -21,22 +16,26 @@ const usersignup = async (req, res) => {
 
         const bcrypt = await import('bcryptjs');
         const hashPassword = await bcrypt.default.hash(password, 10);
+        
+        // Generate unique ID
+        const id = Date.now().toString();
 
         const createUser = await session.run(
             `CREATE (u:User {
-        id: randomUUID(),
-        name: $name,
-        email: $email,
-        password: $password,
-        image: $image,
-        gender: $gender,
-        address: $address,
-        dob: $dob,
-        phone: $phone,
-        role: $role,
-        books: $books
-      }) RETURN u`,
+                id: $id,
+                name: $name,
+                email: $email,
+                password: $password,
+                image: $image,
+                gender: $gender,
+                address: $address,
+                dob: $dob,
+                phone: $phone,
+                role: $role,
+                books: $books
+            }) RETURN u`,
             {
+                id,
                 name,
                 email,
                 password: hashPassword,
