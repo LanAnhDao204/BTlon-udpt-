@@ -1,4 +1,4 @@
 // Config for backend API URL
-const API_URL = 'http://localhost:4002';
- 
+const API_URL = 'http://localhost:8881';
+
 export default API_URL; 

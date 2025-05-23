@@ -6,7 +6,7 @@ dotenv.config();
 
 const driver = neo4j.driver(
   'bolt://localhost:7687',
-  neo4j.auth.basic('neo4j', process.env.NEO4J_PASSWORD || '12345678')
+  neo4j.auth.basic('neo4j', process.env.NEO4J_PASSWORD || 'thang044')
 );
 
 const session = driver.session();

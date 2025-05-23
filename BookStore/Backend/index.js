@@ -18,7 +18,7 @@ app.use(cors({
     credentials: true
 }));
 
-const port = process.env.PORT || 4002;
+const port = process.env.PORT || 8881;
 
 app.listen(port, () => {
     console.log(`🚀 Server is running on port ${port}`);
