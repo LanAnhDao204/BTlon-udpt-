@@ -16,18 +16,19 @@ import searchBook from '../Controllers/searchBook.js';
 const router = express.Router();
 router.get('/book/read/:id', readBook);
 
-router.post('/user/signup',usersignup)
-router.post('/user/login',userlogin)
-router.get('/user/profile/:id',userprofile)
-router.delete('/user/profile/:id',deleteprofile)
-router.put('/user/profile/:id',editprofile)
+router.post('/user/signup', usersignup)
+router.post('/user/login', userlogin)
+router.get('/user/profile/:id', userprofile)
+router.delete('/user/profile/:id', deleteprofile)
+router.put('/user/profile/:id', editprofile)
+router.put('/book/:id', editBook)
 
-router.get('/books',books)
-router.post('/book',addBook)
-router.get('/book/read/:id',readBook)
-router.get('/book/:id',getBook)
-router.put('/book/:id',editBook)
-router.delete('/book/:id',deleteBook)
+router.get('/books', books)
+router.post('/book', addBook)
+router.get('/book/read/:id', readBook)
+router.get('/book/:id', getBook)
+router.put('/book/:id', editBook)
+router.delete('/book/:id', deleteBook)
 router.get('/books/search', searchBook)
 
 export default router
