@@ -17,22 +17,14 @@ const ReadBook = () => {
         try {
             const response = await axios.get(`${API_URL}/books`);
             if (response.data && Array.isArray(response.data)) {
-                // Lọc sách cùng thể loại và loại bỏ sách hiện tại
+                // Chỉ hiển thị sách cùng thể loại và loại bỏ sách hiện tại
                 const sameCategoryBooks = response.data.filter(
                     item => item.category === currentCategory && item.id !== currentBookId
                 );
                 
-                // Nếu có đủ sách cùng thể loại, hiển thị tối đa 6 cuốn
-                if (sameCategoryBooks.length > 0) {
-                    // Trộn ngẫu nhiên để hiển thị đa dạng
-                    const shuffled = sameCategoryBooks.sort(() => 0.5 - Math.random());
-                    setRecommendedBooks(shuffled.slice(0, 6));
-                } else {
-                    // Nếu không đủ sách cùng thể loại, hiển thị sách khác thể loại
-                    const otherBooks = response.data.filter(item => item.id !== currentBookId);
-                    const shuffled = otherBooks.sort(() => 0.5 - Math.random());
-                    setRecommendedBooks(shuffled.slice(0, 6));
-                }
+                // Chỉ hiển thị sách cùng thể loại, không dùng fallback
+                const shuffled = sameCategoryBooks.sort(() => 0.5 - Math.random());
+                setRecommendedBooks(shuffled.slice(0, 6));
             }
         } catch (error) {
             console.error('Error fetching recommended books:', error);
@@ -175,15 +167,14 @@ const ReadBook = () => {
                     </div>
                 </div>
                 
-                {/* Phần truyện gợi ý */}
+                {/* Phần truyện gợi ý - chỉ hiển thị khi có sách cùng thể loại */}
                 {recommendedBooks.length > 0 && (
                     <div className="mt-16 border-t border-gray-300 dark:border-gray-700 pt-8">
-                        {/* Thay đổi tiêu đề để thể hiện cùng thể loại */}
                         <h2 className="text-2xl font-bold mb-6">
-                            {book?.category ? `Truyện cùng thể loại ${book.category}` : "Sách khác bạn có thể thích"}
+                            Truyện cùng thể loại: {book.category}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                            {/* Giữ nguyên giao diện hiển thị sách gợi ý */}
+                            {/* Hiển thị sách cùng thể loại */}
                             {recommendedBooks.map(book => (
                                 <div key={book.id} className="bg-base-200 dark:bg-slate-900 dark:text-white rounded-lg shadow-md p-4 flex flex-col h-full">
                                     <div className="flex justify-center mb-4">
@@ -212,6 +203,18 @@ const ReadBook = () => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                )}
+
+                {/* Hiển thị thông báo khi không có sách cùng thể loại */}
+                {recommendedBooks.length === 0 && (
+                    <div className="mt-16 border-t border-gray-300 dark:border-gray-700 pt-8 text-center">
+                        <h2 className="text-2xl font-bold mb-6">
+                            Truyện cùng thể loại: {book.category}
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400">
+                            Hiện chưa có thêm truyện nào thuộc thể loại này.
+                        </p>
                     </div>
                 )}
             </div>
