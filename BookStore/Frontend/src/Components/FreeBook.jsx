@@ -1,52 +1,9 @@
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
-import Card from './Card';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../config";
+import { Link } from "react-router-dom";
 
 const FreeBook = () => {
-
-    var settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        initialSlide: 0,
-        autoplay: true,
-        autoplaySpeed: 2000,
-        pauseOnHover: true,
-        pauseOnFocus: true,
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                    infinite: true,
-                    dots: true
-                }
-            },
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                    initialSlide: 2
-                }
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
-                }
-            }
-        ]
-    };
-
     const [freebooks, setFreebooks] = useState([])
     const [loading, setLoading] = useState(true)
     
@@ -65,8 +22,9 @@ const FreeBook = () => {
         fetchData();
     },[])
 
-    // Filter theo thể loại hoặc hiển thị 3 sách đầu tiên nếu không có sách loại "Free"
+    // Filter theo thể loại hoặc hiển thị 3 sách đầu tiên nếu không có sách loại "Fiction"
     const filterData = freebooks.filter((item) => item.category === "Fiction").slice(0, 3)
+    const displayBooks = filterData.length > 0 ? filterData : freebooks.slice(0, 3);
     
     if (loading) {
         return (
@@ -88,26 +46,38 @@ const FreeBook = () => {
 
                     <p className="text-sm md:text-xl">Dưới đây là một số sách nổi bật trong thư viện của chúng tôi. Để truy cập toàn bộ sách, bạn có thể truy cập mục Sách từ thanh điều hướng và tìm sách mình mong muốn, bạn chỉ cần đăng ký và đăng nhập để truy cập toàn bộ sách của chúng tôi.</p>
                 </div>
-                <div className='m-5'>
-                    <div className="slider-container">
-                        {freebooks.length > 0 ? (
-                            <Slider {...settings}>
-                                {filterData.length > 0 ? (
-                                    filterData.map((item) => (
-                                        <Card item={item} key={item.id} />
-                                    ))
-                                ) : (
-                                    freebooks.slice(0, 3).map((item) => (
-                                        <Card item={item} key={item.id} />
-                                    ))
-                                )}
-                            </Slider>
-                        ) : (
-                            <div className="text-center py-10">
-                                <p>Không có sách nào</p>
+                
+                {/* Layout hàng ngang thay thế slider */}
+                <div className="flex flex-nowrap overflow-x-auto pb-8 gap-6 mt-8 scrollbar-hide">
+                    {displayBooks.map((book) => (
+                        <div key={book.id} className="flex-none w-64 min-w-[16rem]">
+                            <div className="bg-base-200 dark:bg-slate-900 dark:text-white rounded-lg shadow-md h-full flex flex-col p-4">
+                                <div className="flex justify-center mb-4">
+                                    <img
+                                        src={book.image}
+                                        alt={book.name}
+                                        className="h-60 w-auto object-cover"
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <h3 className="card-title text-lg font-semibold">
+                                        {book.name}
+                                        <span className="badge badge-secondary ml-2 text-xs">{book.category}</span>
+                                    </h3>
+                                </div>
+                                <p className="text-sm mb-4 flex-grow line-clamp-2">{book.title}</p>
+                                <div className="card-actions justify-between mt-auto">
+                                    <div className="badge badge-outline p-3">{book.lang}</div>
+                                    <Link
+                                        to={`/read/${book.id}`}
+                                        className="badge badge-outline p-3 cursor-pointer hover:bg-pink-500 duration-200 hover:text-black"
+                                    >
+                                        Read Online
+                                    </Link>
+                                </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </>

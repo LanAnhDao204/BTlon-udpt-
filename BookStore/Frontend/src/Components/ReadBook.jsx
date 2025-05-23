@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import API_URL from '../config';
+import Card from './Card';
 
 const ReadBook = () => {
     const { id } = useParams();
@@ -10,6 +11,33 @@ const ReadBook = () => {
     const [loading, setLoading] = useState(true);
     const [fontSize, setFontSize] = useState(16);
     const [theme, setTheme] = useState('light');
+    const [recommendedBooks, setRecommendedBooks] = useState([]);
+
+    const fetchRecommendedBooks = async (currentBookId, currentCategory) => {
+        try {
+            const response = await axios.get(`${API_URL}/books`);
+            if (response.data && Array.isArray(response.data)) {
+                // Lọc sách cùng thể loại và loại bỏ sách hiện tại
+                const sameCategoryBooks = response.data.filter(
+                    item => item.category === currentCategory && item.id !== currentBookId
+                );
+                
+                // Nếu có đủ sách cùng thể loại, hiển thị tối đa 6 cuốn
+                if (sameCategoryBooks.length > 0) {
+                    // Trộn ngẫu nhiên để hiển thị đa dạng
+                    const shuffled = sameCategoryBooks.sort(() => 0.5 - Math.random());
+                    setRecommendedBooks(shuffled.slice(0, 6));
+                } else {
+                    // Nếu không đủ sách cùng thể loại, hiển thị sách khác thể loại
+                    const otherBooks = response.data.filter(item => item.id !== currentBookId);
+                    const shuffled = otherBooks.sort(() => 0.5 - Math.random());
+                    setRecommendedBooks(shuffled.slice(0, 6));
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching recommended books:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -18,6 +46,11 @@ const ReadBook = () => {
                 const response = await axios.get(`${API_URL}/book/read/${id}`);
                 setBook(response.data);
                 setLoading(false);
+                
+                // Truyền cả ID và thể loại của sách hiện tại
+                if (response.data && response.data.id && response.data.category) {
+                    fetchRecommendedBooks(response.data.id, response.data.category);
+                }
             } catch (error) {
                 console.error('Error fetching book:', error);
                 toast.error('Failed to load book content');
@@ -27,7 +60,7 @@ const ReadBook = () => {
 
         fetchBook();
     }, [id]);
-
+    
     const increaseFontSize = () => {
         if (fontSize < 24) {
             setFontSize(fontSize + 2);
@@ -117,6 +150,9 @@ const ReadBook = () => {
                             </span>
                         </div>
                         <p className="text-lg mb-6">{book.title}</p>
+                        {book.description && (
+                            <p className="text-md italic mb-4">{book.description}</p>
+                        )}
                     </div>
                 </div>
 
@@ -138,9 +174,49 @@ const ReadBook = () => {
                         )}
                     </div>
                 </div>
+                
+                {/* Phần truyện gợi ý */}
+                {recommendedBooks.length > 0 && (
+                    <div className="mt-16 border-t border-gray-300 dark:border-gray-700 pt-8">
+                        {/* Thay đổi tiêu đề để thể hiện cùng thể loại */}
+                        <h2 className="text-2xl font-bold mb-6">
+                            {book?.category ? `Truyện cùng thể loại ${book.category}` : "Sách khác bạn có thể thích"}
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                            {/* Giữ nguyên giao diện hiển thị sách gợi ý */}
+                            {recommendedBooks.map(book => (
+                                <div key={book.id} className="bg-base-200 dark:bg-slate-900 dark:text-white rounded-lg shadow-md p-4 flex flex-col h-full">
+                                    <div className="flex justify-center mb-4">
+                                        <img
+                                            src={book.image}
+                                            alt={book.name}
+                                            className="h-60 w-auto object-cover"
+                                        />
+                                    </div>
+                                    <div className="mb-2">
+                                        <h3 className="card-title text-lg font-semibold">
+                                            {book.name}
+                                            <span className="badge badge-secondary ml-2">{book.category}</span>
+                                        </h3>
+                                    </div>
+                                    <p className="text-sm mb-4 flex-grow">{book.title}</p>
+                                    <div className="card-actions justify-between mt-auto">
+                                        <div className="badge badge-outline p-3">{book.lang}</div>
+                                        <Link
+                                            to={`/read/${book.id}`}
+                                            className="badge badge-outline p-3 cursor-pointer hover:bg-pink-500 duration-200 hover:text-black"
+                                        >
+                                            Read Online
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-export default ReadBook; 
+export default ReadBook;
