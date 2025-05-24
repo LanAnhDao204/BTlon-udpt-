@@ -1,4 +1,4 @@
-// syncBooksNeo4jFull.js
+// syncBooksWithCategory.js
 import neo4j from 'neo4j-driver';
 import dotenv from 'dotenv';
 
@@ -99,7 +99,8 @@ const sampleBooksFull = [
         link: "",
         content: "Tác phẩm giải thích những khái niệm vật lý và vũ trụ học như Big Bang, lỗ đen, không-thời gian, thuyết tương đối và thuyết lượng tử bằng ngôn ngữ phổ thông cho mọi người cùng tiếp cận.",
         description: "Sách khoa học phổ thông về vũ trụ và thời gian"
-    },
+    }
+    ,
     {
         "id": "123456789",
         "name": "Thế Giới Atlantis",
@@ -122,65 +123,60 @@ const sampleBooksFull = [
         "content": "Nội dung chi tiết sách...",
         "description": "Giới thiệu ngắn gọn về sách"
     }
-    // ... bạn có thể thêm sách tiếp nếu muốn
 ];
 
-async function readBooksFromNeo4j() {
+async function createCategoryAndConnectBooks() {
     try {
-        const result = await session.run('MATCH (b:Book) RETURN b');
-        const books = result.records.map(record => record.get('b').properties);
-        console.log('Exported books from Neo4j:', books);
-        return books;
-    } catch (error) {
-        console.error('Error reading books:', error);
-        return [];
-    }
-}
-
-async function seedBooksToNeo4j(books) {
-    try {
-        // Xóa hết sách cũ
+        // Xóa hết sách và thể loại cũ
         await session.run('MATCH (b:Book) DETACH DELETE b');
-        console.log('Deleted all existing books');
+        await session.run('MATCH (c:Category) DETACH DELETE c');
+        console.log('Deleted all existing books and categories');
 
-        // Thêm sách mới
-        for (const book of books) {
+        // Thêm sách mới và thể loại vào Neo4j
+        for (const book of sampleBooksFull) {
+            // 1. Tạo hoặc tìm kiếm node Category (nếu chưa có) với tên category của sách
             await session.run(
+                `MERGE (c:Category {name: $category})
+                 ON CREATE SET c.createdAt = timestamp()`,
+                { category: book.category }
+            );
+
+            // 2. Tạo node Book
+            const bookResult = await session.run(
                 `CREATE (b:Book {
-          id: $id,
-          name: $name,
-          lang: $lang,
-          category: $category,
-          image: $image,
-          title: $title,
-          link: $link,
-          content: $content,
-          description: $description
-        })`,
+                    id: $id,
+                    name: $name,
+                    lang: $lang,
+                    category: $category,
+                    image: $image,
+                    title: $title,
+                    link: $link,
+                    content: $content,
+                    description: $description
+                })
+                RETURN b`,
                 book
             );
-            console.log(`Created book ${book.name}`);
+
+            // 3. Kết nối sách với category (BELONGS_TO)
+            await session.run(
+                `MATCH (b:Book {id: $id}), (c:Category {name: $category})
+                 MERGE (b)-[:BELONGS_TO]->(c)`,
+                { id: book.id, category: book.category }
+            );
+
+            console.log(`Created book ${book.name} and connected to category ${book.category}`);
         }
 
-        console.log('Seeded books successfully to Neo4j');
+        console.log('Seeded books and categories successfully to Neo4j');
     } catch (error) {
-        console.error('Error seeding books:', error);
+        console.error('Error seeding books and categories:', error);
     }
 }
 
 async function main() {
     try {
-        // Đọc sách hiện tại từ Neo4j
-        const currentBooks = await readBooksFromNeo4j();
-
-        // Tích hợp dữ liệu hiện tại với dữ liệu mẫu đầy đủ (nếu muốn)
-        // Ví dụ: bạn có thể gộp hoặc thay thế hoàn toàn bằng sampleBooksFull
-
-        // Ở đây mình thay thế hoàn toàn bằng sampleBooksFull (để update dữ liệu)
-        const updatedBooks = sampleBooksFull;
-
-        // Ghi dữ liệu mới (updatedBooks) vào Neo4j
-        await seedBooksToNeo4j(updatedBooks);
+        await createCategoryAndConnectBooks();
     } catch (error) {
         console.error('Error in main:', error);
     } finally {
