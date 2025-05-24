@@ -5,15 +5,16 @@ const addBook = async (req, res) => {
     const session = driver.session()
     try {
         const id = uuidv4()
-        const { name, lang, category, image, title, link, content, description } = req.body
+        const { name, lang, category, image, title, link, content, description,author } = req.body
+       
 
         const result = await session.run(
             `CREATE (b:Book {
-        id: $id, name: $name, lang: $lang, category: $category,
-        image: $image, title: $title, link: $link,
-        content: $content, description: $description
-      }) RETURN b`,
-            { id, name, lang, category, image, title, link, content, description }
+                id: $id, name: $name, lang: $lang, category: $category,
+                image: $image, title: $title, link: $link,
+                content: $content, description: $description, author: $author
+            }) RETURN b`,
+            { id, name, lang, category, image, title, link, content, description, author }
         )
 
         const book = result.records[0].get('b').properties

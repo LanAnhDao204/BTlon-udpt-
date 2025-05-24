@@ -4,7 +4,7 @@ const readBook = async (req, res) => {
     const session = driver.session();
     try {
         const { id } = req.params;
-        
+
         if (!id) {
             return res.status(400).json({ message: 'Book ID is required' });
         }
@@ -29,8 +29,10 @@ const readBook = async (req, res) => {
             title: book.title,
             description: book.description,
             content: book.content,
-            link: book.link
+            link: book.link,
+            author: book.author  // thêm dòng này
         });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     } finally {

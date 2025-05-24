@@ -1,36 +1,62 @@
-import driver from '../Database/dbconnection.js';
+const express = require('express');
+const router = express.Router();
+const driver = require('../config/neo4j');
 
-const searchBook = async (req, res) => {
+router.get('/search', async (req, res) => {
     const session = driver.session();
+    const query = req.query.query;
+
     try {
-        const { query } = req.query;
-        
-        if (!query) {
-            return res.status(400).json([]);
+        let cypherQuery;
+        let params = { query: query };
+
+        if (query.startsWith('category:')) {
+            const categoryName = query.replace('category:', '').trim();
+            cypherQuery = `
+                MATCH (b:Book)-[:BELONGS_TO]->(c:Category)
+                WHERE toLower(c.name) CONTAINS toLower($query)
+                RETURN b, c
+            `;
+            params.query = categoryName;
+        } else if (query.startsWith('author:')) {
+            const authorName = query.replace('author:', '').trim();
+            cypherQuery = `
+                MATCH (b:Book)-[:WRITTEN_BY]->(a:Author)
+                WHERE toLower(a.name) CONTAINS toLower($query)
+                RETURN b, a
+            `;
+            params.query = authorName;
+        } else {
+            cypherQuery = `
+                MATCH (b:Book)
+                WHERE toLower(b.title) CONTAINS toLower($query)
+                RETURN b
+            `;
         }
 
-        console.log(`Đang tìm kiếm với từ khóa: "${query}"`);
-        
-        // Tìm kiếm trong nhiều trường của sách với Neo4j
-        const result = await session.run(
-            `MATCH (b:Book)
-             WHERE toLower(b.name) CONTAINS toLower($query) 
-             OR toLower(b.title) CONTAINS toLower($query)
-             OR toLower(b.category) CONTAINS toLower($query)
-             RETURN b`,
-            { query }
-        );
+        const result = await session.run(cypherQuery, params);
+        const books = result.records.map(record => {
+            const bookNode = record.get('b').properties;
+            const category = record.has('c') ? record.get('c').properties : null;
+            const author = record.has('a') ? record.get('a').properties : null;
 
-        const books = result.records.map(record => record.get('b').properties);
-        console.log(`Tìm thấy ${books.length} kết quả`);
-        
-        res.status(200).json(books);
+            return {
+                id: bookNode.id,
+                title: bookNode.title,
+                description: bookNode.description,
+                price: bookNode.price,
+                category: category ? category.name : undefined,
+                author: author ? author.name : undefined
+            };
+        });
+
+        res.json(books);
     } catch (error) {
-        console.error('Lỗi tìm kiếm:', error);
-        res.status(500).json([]);
+        console.error('Lỗi khi tìm kiếm:', error);
+        res.status(500).send('Có lỗi xảy ra khi tìm kiếm');
     } finally {
         await session.close();
     }
-};
+});
 
-export default searchBook;
+module.exports = router;
