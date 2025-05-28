@@ -25,7 +25,7 @@ const userlogin = async (req, res) => {
         res.status(200).json({
             message: 'Login Successful',
             user: {
-                id: userNode.id, // Include id in the response
+                id: userNode.id, 
                 name: userNode.name,
                 email: userNode.email,
                 image: userNode.image,

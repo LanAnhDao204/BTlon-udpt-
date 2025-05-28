@@ -1,62 +1,56 @@
-const express = require('express');
+import express from 'express';
+import neo4j from 'neo4j-driver';
+
 const router = express.Router();
-const driver = require('../config/neo4j');
+const driver = neo4j.driver(
+    'bolt://localhost:7687',
+    neo4j.auth.basic('neo4j', 'thang044')
+);
 
-router.get('/search', async (req, res) => {
+const searchBook = async (req, res) => {
     const session = driver.session();
-    const query = req.query.query;
-
     try {
-        let cypherQuery;
-        let params = { query: query };
+        const { query } = req.query;
 
-        if (query.startsWith('category:')) {
-            const categoryName = query.replace('category:', '').trim();
-            cypherQuery = `
-                MATCH (b:Book)-[:BELONGS_TO]->(c:Category)
-                WHERE toLower(c.name) CONTAINS toLower($query)
-                RETURN b, c
-            `;
-            params.query = categoryName;
-        } else if (query.startsWith('author:')) {
-            const authorName = query.replace('author:', '').trim();
-            cypherQuery = `
-                MATCH (b:Book)-[:WRITTEN_BY]->(a:Author)
-                WHERE toLower(a.name) CONTAINS toLower($query)
-                RETURN b, a
-            `;
-            params.query = authorName;
-        } else {
-            cypherQuery = `
-                MATCH (b:Book)
-                WHERE toLower(b.title) CONTAINS toLower($query)
-                RETURN b
-            `;
+        if (!query) {
+            return res.status(400).json([]);
         }
 
-        const result = await session.run(cypherQuery, params);
-        const books = result.records.map(record => {
-            const bookNode = record.get('b').properties;
-            const category = record.has('c') ? record.get('c').properties : null;
-            const author = record.has('a') ? record.get('a').properties : null;
+        let cypherQuery = '';
+        let param = '';
 
-            return {
-                id: bookNode.id,
-                title: bookNode.title,
-                description: bookNode.description,
-                price: bookNode.price,
-                category: category ? category.name : undefined,
-                author: author ? author.name : undefined
-            };
-        });
+        if (query.startsWith('category:')) {
+            param = query.replace('category:', '').trim();
+            cypherQuery = `MATCH (b:Book)
+                           WHERE toLower(b.category) CONTAINS toLower($param)
+                           RETURN b`;
+        } else if (query.startsWith('author:')) {
+            param = query.replace('author:', '').trim();
+            cypherQuery = `MATCH (b:Book)
+                           WHERE toLower(b.author) CONTAINS toLower($param)
+                           RETURN b`;
+        } else {
+            param = query;
+            cypherQuery = `MATCH (b:Book)
+                           WHERE toLower(b.name) CONTAINS toLower($param)
+                           OR toLower(b.title) CONTAINS toLower($param)
+                           OR toLower(b.category) CONTAINS toLower($param)
+                           OR toLower(b.author) CONTAINS toLower($param)
+                           RETURN b`;
+        }
 
-        res.json(books);
+        const result = await session.run(cypherQuery, { param });
+
+        const books = result.records.map(record => record.get('b').properties);
+        res.status(200).json(books);
     } catch (error) {
-        console.error('Lỗi khi tìm kiếm:', error);
-        res.status(500).send('Có lỗi xảy ra khi tìm kiếm');
+        console.error('Search error:', error);
+        res.status(500).json({ message: 'Internal server error' });
     } finally {
         await session.close();
     }
-});
+};
 
-module.exports = router;
+router.get('/books/search', searchBook);
+
+export default router;
