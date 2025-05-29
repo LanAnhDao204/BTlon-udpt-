@@ -11,6 +11,12 @@ import ProfilePage from "./Pages/ProfilePage";
 import ReadBook from "./Components/ReadBook";
 import SearchResults from "./Components/SearchResults";
 
+// Import các components Admin mới
+import AdminLayout from './Components/Admin/AdminLayout';
+import AdminDashboard from './Components/Admin/AdminDashboard';
+import AdminUsers from './Components/Admin/AdminUsers';
+import AdminBooks from './Components/Admin/AdminBooks';
+
 
 export default function App() {
   const [auth] = useAuth()
@@ -26,14 +32,21 @@ export default function App() {
           <Route
             path="/profile"
             element={auth ? <ProfilePage /> : <Navigate to={'/login'} />} />
-          <Route 
-            path="/read/:id" 
+          <Route
+            path="/read/:id"
             element={auth ? <ReadBook /> : <Navigate to={'/login'} />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/search" element={<SearchResults />} />
+
+          {/* Admin Routes */}
+          <Route path="admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="books" element={<AdminBooks />} />
+          </Route>
         </Routes>
         <Toaster />
       </div>

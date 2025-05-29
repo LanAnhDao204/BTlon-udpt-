@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import DeleteProfile from "./DeleteProfile";
 import EditProfile from "./EditProfile";
+import API_URL from "../config"; // Thêm dòng này
 
 const Profile = () => {
   const [user, setUser] = useState([""]);
@@ -12,10 +13,10 @@ const Profile = () => {
     async function fetchData() {
       try {
         const userInfo = localStorage.getItem("User");
-        const userId = JSON.parse(userInfo)._id;
+        const userId = JSON.parse(userInfo).id; // Đổi _id thành id
 
         const res = await axios.get(
-          `https://bookstore-backend-m8u6.onrender.com/user/profile/${userId}`
+          `${API_URL}/user/profile/${userId}` // Thay URL trực tiếp bằng API_URL
         );
         setUser(res.data);
       } catch (error) {

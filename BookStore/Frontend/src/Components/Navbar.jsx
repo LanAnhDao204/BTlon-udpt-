@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/Authprovider";
 import Logout from "./Logout";
+import axios from "axios";
+import API_URL from "../config"; // Thêm dòng import này
 
 
 const Navbar = () => {
@@ -11,6 +13,7 @@ const Navbar = () => {
     const element = document.documentElement;
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(()=>{
         if(theme === 'dark'){
@@ -46,13 +49,43 @@ const Navbar = () => {
             window.removeEventListener('scroll',handleScroll)
         }
     },[])
+
+    useEffect(() => {
+        const checkIfAdmin = async () => {
+            try {
+                const userInfo = localStorage.getItem("User");
+                if (!userInfo) return;
+                
+                const userId = JSON.parse(userInfo).id;
+                const res = await axios.get(`${API_URL}/user/profile/${userId}`);
+                
+                if (res.data.role && res.data.role.toLowerCase() === "admin") {
+                    setIsAdmin(true);
+                }
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+            }
+        };
+        
+        checkIfAdmin();
+    }, []);
+
     const navItems = (
         <>
             <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/">Trang chủ</a></li>
             <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/profile">Hồ sơ</a></li>
-            <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/books">Sách</a></li>
             <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/about">Giới thiệu</a></li>
             <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/contact">Liên hệ</a></li>
+            {isAdmin && (
+                <li className="rounded-md dark:hover:bg-pink-500 duration-200">
+                    <a href="/admin" className="flex items-center">
+                        <span className="mr-1">Admin</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                        </svg>
+                    </a>
+                </li>
+            )}
         </>
     )
     return (
