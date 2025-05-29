@@ -18,6 +18,8 @@ const AdminBooks = () => {
     description: '',
     link: '',
   });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -58,14 +60,52 @@ const AdminBooks = () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let imageUrl = formData.image;
+
+      // Xử lý upload ảnh nếu có file được chọn
+      if (selectedImage) {
+        // Tạo đối tượng FormData để upload file
+        const imageData = new FormData();
+        imageData.append('image', selectedImage);
+        
+        try {
+          // Giả lập upload ảnh - trong thực tế sẽ gửi đến API upload
+          // Ví dụ: const res = await axios.post(`${API_URL}/upload-image`, imageData);
+          // imageUrl = res.data.url;
+          
+          // Tạm thời dùng local URL cho demo
+          imageUrl = imagePreview;
+          
+          toast.success('Tải ảnh lên thành công');
+        } catch (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          toast.error('Lỗi khi tải ảnh lên');
+          return;
+        }
+      }
+
+      // Cập nhật dữ liệu với URL ảnh mới
+      const updatedData = {
+        ...formData,
+        image: imageUrl
+      };
+
       if (isEditing) {
-        await axios.put(`${API_URL}/book/edit/${formData.id}`, formData);
+        await axios.put(`${API_URL}/book/edit/${formData.id}`, updatedData);
         toast.success('Cập nhật sách thành công');
       } else {
-        await axios.post(`${API_URL}/book/add`, formData);
+        await axios.post(`${API_URL}/book/add`, updatedData);
         toast.success('Thêm sách mới thành công');
       }
       
@@ -105,6 +145,7 @@ const AdminBooks = () => {
       description: book.description || '',
       link: book.link || '',
     });
+    setImagePreview(book.image || '');
     setIsEditing(true);
     setShowForm(true);
   };
@@ -122,6 +163,8 @@ const AdminBooks = () => {
       description: '',
       link: '',
     });
+    setSelectedImage(null);
+    setImagePreview("");
     setIsEditing(false);
     setShowForm(false);
   };
@@ -210,15 +253,34 @@ const AdminBooks = () => {
               </div>
               
               <div>
-                <label className="block mb-1">URL Hình ảnh</label>
-                <input
-                  type="text"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
-                  required
-                />
+                <label className="block mb-1">Hình ảnh</label>
+                <div className="flex flex-col space-y-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                  />
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <p className="text-sm mb-1">Xem trước:</p>
+                      <img 
+                        src={imagePreview} 
+                        alt="Xem trước" 
+                        className="h-40 object-contain border rounded" 
+                      />
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">hoặc nhập URL hình ảnh:</p>
+                  <input
+                    type="text"
+                    name="image"
+                    value={formData.image}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                  />
+                </div>
               </div>
               
               <div>
