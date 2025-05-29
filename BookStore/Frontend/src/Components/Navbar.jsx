@@ -74,8 +74,6 @@ const Navbar = () => {
         <>
             <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/">Trang chủ</a></li>
             <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/profile">Hồ sơ</a></li>
-            <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/about">Giới thiệu</a></li>
-            <li className="rounded-md dark:hover:bg-pink-500 duration-200"><a href="/contact">Liên hệ</a></li>
             {isAdmin && (
                 <li className="rounded-md dark:hover:bg-pink-500 duration-200">
                     <a href="/admin" className="flex items-center">
