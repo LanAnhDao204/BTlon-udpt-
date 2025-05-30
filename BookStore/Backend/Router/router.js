@@ -14,37 +14,35 @@ import searchBook from '../Controllers/searchBook.js';
 import { getAllUsers, getStats, deleteUser } from '../Controllers/adminControllers.js';
 import authMiddleware from '../Middleware/authMiddleware.js';
 
+
 const router = express.Router();
 
 // Đăng nhập, đăng ký
 router.post('/user/login', userlogin);
-router.post('/user/signup', usersignup);
+router.post('/user/signup', usersignup)
 
 // User profile
-router.get('/user/profile/:id', userprofile);
-router.delete('/user/profile/:id', deleteprofile);
-router.put('/user/profile/:id', editprofile);
+router.get('/user/profile/:id', userprofile)
+router.delete('/user/profile/:id', deleteprofile)
+router.put('/user/profile/:id', editprofile)
 
 // Books
-router.get('/books', books);
-router.get('/book/:id', getBook);
-router.get('/book/read/:id', readBook);
-router.post('/book/add', addBook);
-router.put('/book/edit/:id', editBook);
-router.delete('/book/delete/:id', deleteBook);
+router.get('/books', books)
+router.get('/book/:id', getBook)
+router.get('/book/read/:id', readBook)
+router.post('/book/add', addBook)
+router.put('/book/edit/:id', editBook)
+router.delete('/book/delete/:id', deleteBook)
 
 // Search
-router.get('/books/search', searchBook);
+router.get('/books/search', searchBook)
 
 // Admin routes - thêm middleware kiểm tra quyền admin
-router.get('/admin/users', getAllUsers);
-router.get('/admin/stats', getStats);
-router.delete('/admin/users/:id', deleteUser);
+router.get('/admin/users', authMiddleware, getAllUsers);
+router.get('/admin/stats', authMiddleware, getStats);
+router.delete('/admin/users/:id', authMiddleware, deleteUser);
 
-// Kiểm tra route gốc
-router.get('/', (req, res) => {
-    res.send('📚 Bookstore API is running!');
-});
+// Other routes
+// router.post('/sendmail', sendmail);
 
-// ✅ Export mặc định
-export default router;
+export default router
