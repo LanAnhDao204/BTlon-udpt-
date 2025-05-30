@@ -5,11 +5,13 @@ import { toast } from "react-hot-toast";
 import API_URL from "../config";
 import { useState } from "react";
 import { useAuth } from "../Context/Authprovider";
+import { checkBackendConnection } from '../utils/apiCheck';
 
 const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [auth, setAuth] = useAuth();
+  const [backendStatus, setBackendStatus] = useState(null);
   const {
     register,
     handleSubmit,
@@ -26,8 +28,11 @@ const Login = () => {
         password: data.password
       };
       
-      console.log("Sending login request to:", `${API_URL}/user/login`);
-      const res = await axios.post(`${API_URL}/user/login`, userInfo);
+      // Thêm timeout lâu hơn cho kết nối backend production
+      const res = await axios.post(`${API_URL}/user/login`, userInfo, { 
+        timeout: 15000,
+        withCredentials: false // Thử tắt credentials nếu gặp vấn đề CORS
+      });
       
       console.log("Login response:", res.data);
       
@@ -55,14 +60,31 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error("Login error:", error);
-      if(error.response) {
-        toast.error("Error: " + error.response.data.message);
+      console.error("Login error DETAILS:", error);
+      
+      // Hiển thị thêm thông tin lỗi
+      if (error.response) {
+        console.error("Response status:", error.response.status);
+        console.error("Response data:", error.response.data);
+        toast.error(`Error (${error.response.status}): ${error.response.data.message}`);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        toast.error("Server không phản hồi. Kiểm tra kết nối mạng hoặc backend.");
       } else {
-        toast.error("Error: Network or server issue");
+        toast.error("Lỗi: " + error.message);
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const testBackendConnection = async () => {
+    const result = await checkBackendConnection();
+    setBackendStatus(result);
+    if (result.success) {
+      toast.success("Kết nối backend thành công!");
+    } else {
+      toast.error("Không thể kết nối backend!");
     }
   };
 
@@ -114,6 +136,23 @@ const Login = () => {
                 </p>
               </div>
             </form>
+            
+            {/* Thêm nút kiểm tra kết nối backend */}
+            <div className="text-center mt-4">
+              <button
+                type="button" // Đặt type="button" để không submit form
+                onClick={testBackendConnection}
+                className="text-sm text-gray-400 hover:text-gray-300"
+              >
+                Kiểm tra kết nối backend
+              </button>
+              
+              {backendStatus && (
+                <div className={`text-xs mt-2 ${backendStatus.success ? 'text-green-500' : 'text-red-500'}`}>
+                  {backendStatus.message}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
