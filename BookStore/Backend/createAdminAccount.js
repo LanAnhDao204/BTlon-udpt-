@@ -4,16 +4,25 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: "./config/config.env" });
 
-const uri = process.env.NEO4J_URI || 'bolt://localhost:7690';
-const username = process.env.NEO4J_USER || 'neo4j';
+const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
+const username = process.env.NEO4J_USERNAME || process.env.NEO4J_USER || 'neo4j';
 const password = process.env.NEO4J_PASSWORD || 'thang044';
 
 console.log("Connecting to Neo4j at:", uri);
+console.log("Username:", username);
 
-const driver = neo4j.driver(
-  uri,
-  neo4j.auth.basic(username, password)
-);
+// Kết nối và tạo admin
+const driver = neo4j.driver(uri, neo4j.auth.basic(username, password));
+
+// Thêm kiểm tra kết nối trước khi tạo
+driver.verifyConnectivity()
+  .then(() => {
+    console.log("Successfully connected to Neo4j database");
+    createAdminUser(); // Chỉ tạo admin khi kết nối thành công
+  })
+  .catch(err => {
+    console.error("Failed to connect to Neo4j:", err);
+  });
 
 const session = driver.session();
 
@@ -63,5 +72,3 @@ const createAdminUser = async () => {
     await driver.close();
   }
 };
-
-createAdminUser();

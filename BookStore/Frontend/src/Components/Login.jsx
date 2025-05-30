@@ -26,7 +26,10 @@ const Login = () => {
         password: data.password
       };
       
+      console.log("Sending login request to:", `${API_URL}/user/login`);
       const res = await axios.post(`${API_URL}/user/login`, userInfo);
+      
+      console.log("Login response:", res.data);
       
       if(res.data) {
         toast.success("Login Successfully");
@@ -40,13 +43,14 @@ const Login = () => {
         localStorage.setItem("User", JSON.stringify(res.data.user));
         
         console.log("User role:", res.data.user.role);
+        console.log("User role lowercase:", res.data.user.role ? res.data.user.role.toLowerCase() : "undefined");
         
-        // Kiểm tra nếu là admin thì redirect đến trang admin
-        if(res.data.user.role && res.data.user.role.toLowerCase() === 'admin') {
-          console.log("Redirecting to admin page");
+        // Kiểm tra cả chữ hoa và chữ thường, thêm nhiều log
+        if(res.data.user.role && typeof res.data.user.role === 'string' && res.data.user.role.toLowerCase() === 'admin') {
+          console.log("Admin role detected, redirecting to admin page");
           navigate('/admin');
         } else {
-          console.log("Redirecting to home page");
+          console.log("Not an admin, redirecting to home page");
           navigate('/');
         }
       }

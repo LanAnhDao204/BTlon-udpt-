@@ -6,8 +6,10 @@ const userlogin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Thêm log để debug
-        console.log("Attempting login for:", email);
+        // Thêm log chi tiết
+        console.log("Login attempt details:");
+        console.log("Email:", email);
+        console.log("Password length:", password ? password.length : 0);
 
         const userResult = await session.run(
             'MATCH (u:User {email: $email}) RETURN u',
@@ -20,10 +22,13 @@ const userlogin = async (req, res) => {
         }
 
         const userNode = userResult.records[0].get('u').properties;
-        console.log("Found user:", userNode.name, "with role:", userNode.role);
+        console.log("Found user details:");
+        console.log("Name:", userNode.name);
+        console.log("Role:", userNode.role);
+        console.log("Password hash:", userNode.password ? userNode.password.substring(0, 10) + "..." : "undefined");
         
         try {
-            // Sử dụng bcrypt imported trực tiếp
+            // Kiểm tra password
             const isMatch = await bcrypt.compare(password, userNode.password);
             console.log("Password match result:", isMatch);
 
