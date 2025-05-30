@@ -59,7 +59,9 @@ Hãy làm theo các bước sau để chạy ứng dụng trên máy của bạn
    PORT=5000
    ```
 
-Khi cả hai máy chủ đều đang chạy, bạn có thể xem ứng dụng trong trình duyệt của mình tại http://localhost:5173 (hoặc cổng được chỉ định trong Vite). Backend sẽ có thể truy cập tại http://localhost:5000 (hoặc cổng tùy chỉnh của bạn)
+Khi cả hai máy chủ đều đang chạy, bạn có thể xem ứng dụng trong trình duyệt của mình tại http://localhost:5173 (hoặc cổng được chỉ định trong Vite).  
+**Backend production:** https://bs-noqz.onrender.com  
+**Backend local:** http://localhost:5000 (hoặc cổng tùy chỉnh của bạn)
 
 ## 🛠 Được xây dựng bằng
 - Vite
