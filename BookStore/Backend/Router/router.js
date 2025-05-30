@@ -38,9 +38,9 @@ router.delete('/book/delete/:id', deleteBook)
 router.get('/books/search', searchBook)
 
 // Admin routes - thêm middleware kiểm tra quyền admin
-router.get('/admin/users', authMiddleware, getAllUsers);
-router.get('/admin/stats', authMiddleware, getStats);
-router.delete('/admin/users/:id', authMiddleware, deleteUser);
+router.get('/admin/users', getAllUsers);
+router.get('/admin/stats', getStats);
+router.delete('/admin/users/:id', deleteUser);
 
 // Other routes
 // router.post('/sendmail', sendmail);
