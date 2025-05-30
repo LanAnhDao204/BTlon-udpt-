@@ -32,5 +32,4 @@ app.get('/', (req, res) => {
     res.status(200).json({ message: "BookStore backend is running!" });
 });
 
-// ❌ KHÔNG gọi DbConnect() nữa!
-// vì dbconnection.js đã kết nối sẵn rồi khi import
+//
