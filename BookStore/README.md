@@ -1,71 +1,73 @@
-# 📚 BOOKSTORE Web App
+# 📚 Ứng dụng Web BOOKSTORE
 
-Welcome to the **BOOKSTORE** web app! This is a fully responsive, visually appealing web application built using the MERN stack (MongoDB, Express.js, React, Node.js) with Vite and styled with Tailwind CSS.
+Chào mừng đến với ứng dụng web **BOOKSTORE**! Đây là một ứng dụng web đáp ứng hoàn toàn, hấp dẫn về mặt trực quan được xây dựng bằng công nghệ MERN stack (Neo4j, Express.js, React, Node.js) với Vite và được tạo kiểu bằng Tailwind CSS.
 
-I have built this web app with the MERN stack (MongoDB, Express, React, Node.js), Vite, and Tailwind CSS. The application includes an admin dashboard for publishing, editing, and deleting books, as well as user functionality for browsing and reading. Integrated dark/light modes, secure signup and login, and protected routes to enhance user experience and security. This project highlights my skills in full-stack development, responsive design, and building secure, high-performance applications.
+Tôi đã xây dựng ứng dụng web này với công nghệ MERN stack (Neo4j, Express, React, Node.js), Vite và Tailwind CSS. Ứng dụng bao gồm bảng điều khiển admin để xuất bản, chỉnh sửa và xóa sách, cũng như chức năng người dùng để duyệt và đọc sách. Tích hợp chế độ tối/sáng, đăng ký và đăng nhập an toàn, cùng với các tuyến đường được bảo vệ để nâng cao trải nghiệm người dùng và bảo mật. Dự án này thể hiện kỹ năng của tôi trong phát triển full-stack, thiết kế đáp ứng và xây dựng các ứng dụng an toàn, hiệu suất cao.
 
-## 🌟 Features
+## 🌟 Tính năng
 
-- Built with **Vite** for fast, efficient builds.
-- **React** front-end with **Tailwind CSS** for a modern, responsive UI.
-- **Node.js** and **Express** for server-side handling.
-- **MongoDB** as the database to store book data.
-- Fully **responsive** design, optimized for all screen sizes.
-- User-friendly and visually appealing.
+- Được xây dựng với **Vite** để có bản dựng nhanh chóng, hiệu quả.
+- Front-end **React** với **Tailwind CSS** cho giao diện người dùng hiện đại, đáp ứng.
+- **Node.js** và **Express** để xử lý phía máy chủ.
+- Cơ sở dữ liệu đồ thị **Neo4j** để quản lý dữ liệu linh hoạt và hiệu quả.
+- Thiết kế hoàn toàn **đáp ứng**, được tối ưu hóa cho mọi kích thước màn hình.
+- Thân thiện với người dùng và hấp dẫn về mặt trực quan.
 
-## 🚀 Getting Started
+## 🚀 Bắt đầu
 
-Follow these steps to get the app up and running on your local machine.
+Hãy làm theo các bước sau để chạy ứng dụng trên máy của bạn.
 
-### Prerequisites
+### Điều kiện tiên quyết
 
-Ensure you have the following installed:
+Đảm bảo bạn đã cài đặt những thứ sau:
 
 - Node.js
-- MongoDB
+- Cơ sở dữ liệu Neo4j
 - Git
 
-### Installation
+### Hướng dẫn cài đặt
 
-1. **Clone the repository:**
+1. **Sao chép mã nguồn:**
    ```bash
-   git clone https://github.com/shivpathk/BookStore.git
-   cd bookstore
+   git clone https://github.com/nhawngkun/BTlon-udpt-.git
+   cd BTlon-udpt-/BookStore
    ```
-2. **Setting Up the Frontend:**
-      ```bash
-      cd .\Frontend\
-      npm install
-      npm run dev
-      ```
-3. **Setting Up the Backend:**
+2. **Cài đặt Frontend:**
    ```bash
-   cd .\Backend\
+   cd Frontend
    npm install
-   nodemon run dev
+   npm run dev
    ```
-4. **Setting Up the Environment Variables:**
-   Create a .env file in the backend directory and set up the following environment variables:
+3. **Cài đặt Backend:**
    ```bash
-   MONGO_URI=your_mongodb_connection_string
-   PORT=your_backend_port
+   cd ../Backend
+   npm install
+   npm run dev
    ```
-Once both servers are running, you can view the app in your browser at http://localhost:5173 (or the port specified in Vite). The backend will be accessible at http://localhost:port
+   
+   Nếu bạn đang sử dụng nodemon cho phát triển:
+   ```bash
+   npx nodemon index.js
+   ```
+   
+4. **Thiết lập biến môi trường:**
+   Tạo một file `.env` trong thư mục backend và thiết lập các biến môi trường sau:
+   ```bash
+   NEO4J_URI=bolt://localhost:7690
+   NEO4J_USERNAME=neo4j
+   NEO4J_PASSWORD=thang044
+   PORT=5000
+   ```
 
-## 🛠 Built With
+Khi cả hai máy chủ đều đang chạy, bạn có thể xem ứng dụng trong trình duyệt của mình tại http://localhost:5173 (hoặc cổng được chỉ định trong Vite). Backend sẽ có thể truy cập tại http://localhost:5000 (hoặc cổng tùy chỉnh của bạn)
+
+## 🛠 Được xây dựng bằng
 - Vite
 - React
 - Tailwind CSS
 - Node.js
 - Express.js
-- MongoDB
+- Neo4j
 
-  
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to fork the repository and make your improvements.
 
-## 📄 License
-This project is licensed under the MIT License.
 
-Happy Coding! 😊
-       
