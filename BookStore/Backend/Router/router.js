@@ -44,5 +44,3 @@ router.delete('/admin/users/:id', deleteUser);
 
 // Other routes
 // router.post('/sendmail', sendmail);
-
-export default router
