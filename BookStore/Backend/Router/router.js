@@ -44,3 +44,7 @@ router.delete('/admin/users/:id', deleteUser);
 
 // Other routes
 // router.post('/sendmail', sendmail);
+
+router.get('/', (req, res) => {
+    res.send('📚 Bookstore API is running!');
+});
