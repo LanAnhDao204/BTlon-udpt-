@@ -26,7 +26,13 @@ const Login = () => {
         password: data.password
       };
       
-      const res = await axios.post(`${API_URL}/user/login`, userInfo);
+      // Thử thêm cấu hình để tránh lỗi CORS
+      const res = await axios.post(`${API_URL}/user/login`, userInfo, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: false  // Set to false if CORS issues occur
+      });
       
       if(res.data) {
         toast.success("Login Successfully");

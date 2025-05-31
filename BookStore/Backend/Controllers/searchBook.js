@@ -3,8 +3,8 @@ import neo4j from 'neo4j-driver';
 
 const router = express.Router();
 const driver = neo4j.driver(
-    'bolt://localhost:7687',
-    neo4j.auth.basic('neo4j', 'thang044')
+    'neo4j+s://58270351.databases.neo4j.io',
+    neo4j.auth.basic('neo4j', 'UlXPYheImRAqEPXhXehOLc89qRc9AKM6us2x2VJHgkY')
 );
 
 const searchBook = async (req, res) => {

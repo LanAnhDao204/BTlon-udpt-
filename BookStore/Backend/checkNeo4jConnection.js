@@ -30,15 +30,15 @@ async function checkConnections() {
       description: "Environment variables"
     },
     {
-      uri: "bolt://localhost:7690",
+      uri: "neo4j+s://58270351.databases.neo4j.io",
       user: "neo4j",
-      password: "thang044",
+      password: "UlXPYheImRAqEPXhXehOLc89qRc9AKM6us2x2VJHgkY",
       description: "Default port 7690"
     },
     {
-      uri: "bolt://localhost:7687",
+      uri: "neo4j+s://58270351.databases.neo4j.io",
       user: "neo4j",
-      password: "thang044", 
+      password: "UlXPYheImRAqEPXhXehOLc89qRc9AKM6us2x2VJHgkY", 
       description: "Default Neo4j port 7687"
     }
   ];
