@@ -24,7 +24,7 @@ const AdminBooks = () => {
   const [showForm, setShowForm] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingData, setPendingData] = useState(null);
+  const [showSyncConfirm, setShowSyncConfirm] = useState(false);
 
   useEffect(() => {
     fetchBooks();
@@ -65,74 +65,61 @@ const AdminBooks = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => { // Tạo URL tạm thời, không phù hợp để lưu vào DB
+        // Lưu base64 vào formData để gửi lên server
+        setFormData(prev => ({
+          ...prev,
+          image: reader.result
+        }));
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
       setSelectedImage(file);
-      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setPendingData({ ...formData, image: selectedImage ? imagePreview : formData.image });
-    setShowConfirm(true);
-  };
-
-  const handleConfirmAdd = async () => {
-    setShowConfirm(false);
     try {
-      let imageUrl = pendingData.image;
-
-      // Xử lý upload ảnh nếu có file được chọn
-      if (selectedImage) {
-        // Tạo đối tượng FormData để upload file
-        const imageData = new FormData();
-        imageData.append('image', selectedImage);
-        
-        try {
-          // Giả lập upload ảnh - trong thực tế sẽ gửi đến API upload
-          // Ví dụ: const res = await axios.post(`${API_URL}/upload-image`, imageData);
-          // imageUrl = res.data.url;
-          
-          // Tạm thời dùng local URL cho demo
-          imageUrl = imagePreview;
-          
-          toast.success('Tải ảnh lên thành công');
-        } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          toast.error('Lỗi khi tải ảnh lên');
-          return;
-        }
-      }
-
-      // Cập nhật dữ liệu với URL ảnh mới
-      const updatedData = {
-        ...pendingData,
-        image: imageUrl
-      };
-
-      // Gửi request thêm sách
+      setLoading(true);
+      const updatedData = { ...formData };
+      
       if (isEditing) {
-        await axios.put(`${API_URL}/book/edit/${pendingData.id}`, updatedData);
+        // Xử lý chỉnh sửa sách
+        await axios.put(`${API_URL}/book/edit/${formData.id}`, updatedData);
         toast.success('Cập nhật sách thành công');
+        fetchBooks();
+        window.dispatchEvent(new Event('books-updated')); // Thông báo cập nhật sách
+        resetForm();
       } else {
-        await axios.post(`${API_URL}/book/add`, updatedData);
-        toast.success('Thêm sách mới thành công');
+        // Thêm sách mới vào Neo4j (đã tự động liên kết tác giả và thể loại)
+        const addResponse = await axios.post(`${API_URL}/book/add`, updatedData);
+        if (!addResponse.data.success) {
+          throw new Error(`⛔ Thêm sách thất bại: ${addResponse.data.message}`);
+        }
+        toast.success('Thêm sách mới thành công và đã liên kết với tác giả và thể loại');
+        fetchBooks();
+        window.dispatchEvent(new Event('books-updated')); // Thông báo cập nhật sách
+        resetForm();
       }
-
-      // Gọi API backend để chạy syncBooksNeo4jFull.js
-      await axios.post(`${API_URL}/admin/sync-books`);
-      toast.success('Đồng bộ dữ liệu thành công');
-
-      fetchBooks();
-      resetForm();
     } catch (error) {
-      console.error('Error saving book:', error);
-      toast.error('Lỗi khi lưu sách');
+      console.error('❌ LỖI:', error);
+      
+      // Hiển thị thông báo lỗi chi tiết hơn
+      if (error.response) {
+        // Lỗi từ phía server
+        toast.error(`Lỗi (${error.response.status}): ${error.response.data.message || 'Không thể xử lý yêu cầu'}`);
+      } else if (error.request) {
+        // Không nhận được phản hồi
+        toast.error('Không nhận được phản hồi từ server. Vui lòng kiểm tra kết nối.');
+      } else {
+        // Lỗi khác
+        toast.error(`Lỗi: ${error.message}`);
+      }
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleCancelAdd = () => {
-    setShowConfirm(false);
-    setPendingData(null);
   };
 
   const handleDelete = async (id) => {
@@ -363,30 +350,6 @@ const AdminBooks = () => {
               </button>
             </div>
           </form>
-        </div>
-      )}
-
-      {/* Modal xác nhận */}
-      {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 w-80 text-center">
-            <h2 className="text-xl font-bold mb-4">Xác nhận thêm sách</h2>
-            <p>Bạn có chắc chắn muốn thêm sách này không?</p>
-            <div className="flex justify-center gap-4 mt-6">
-              <button
-                onClick={handleCancelAdd}
-                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
-              >
-                Không
-              </button>
-              <button
-                onClick={handleConfirmAdd}
-                className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
-              >
-                Có
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
