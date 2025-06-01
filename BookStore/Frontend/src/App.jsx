@@ -17,11 +17,30 @@ import AdminDashboard from './Components/Admin/AdminDashboard';
 import AdminUsers from './Components/Admin/AdminUsers';
 import AdminBooks from './Components/Admin/AdminBooks';
 import DebugAdmin from './Components/Admin/DebugAdmin';
-
+import { useEffect } from "react";
+import API_URL from "./config";
 
 export default function App() {
   const [auth] = useAuth();
-  console.log("Current auth state:", auth); // Thêm log để debug
+  
+  // Log API URL khi ứng dụng khởi động
+  useEffect(() => {
+    console.log("App initialized with API_URL:", API_URL);
+    console.log("Current auth state:", auth);
+    
+    // Test backend connection
+    const checkBackend = async () => {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        console.log("Backend connection test:", data);
+      } catch (error) {
+        console.error("Backend connection failed:", error);
+      }
+    };
+    
+    checkBackend();
+  }, []);
 
   return (
     <>
@@ -42,14 +61,26 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/debug" element={<DebugAdmin />} /> {/* Route này không yêu cầu authentication */}
 
           {/* Admin Routes - đảm bảo không phụ thuộc vào auth từ context */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="books" element={<AdminBooks />} />
-            <Route path="debug" element={<DebugAdmin />} /> {/* Thêm route debug */}
+            <Route path="debug" element={<DebugAdmin />} />
           </Route>
+          
+          {/* Fallback cho đường dẫn không tồn tại */}
+          <Route path="*" element={
+            <div className="flex flex-col items-center justify-center h-screen">
+              <h1 className="text-3xl font-bold mb-4">404 - Trang không tồn tại</h1>
+              <p className="mb-8">Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.</p>
+              <Link to="/" className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700">
+                Quay về trang chủ
+              </Link>
+            </div>
+          } />
         </Routes>
         <Toaster />
       </div>

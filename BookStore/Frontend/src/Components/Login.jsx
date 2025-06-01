@@ -3,19 +3,47 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import API_URL from "../config";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../Context/Authprovider";
 
 const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [auth, setAuth] = useAuth();
+  const [backendStatus, setBackendStatus] = useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm();
 
+  // Thêm function kiểm tra kết nối backend
+  const testBackendConnection = async () => {
+    try {
+      console.log("Kiểm tra kết nối đến:", API_URL);
+      const response = await axios.get(`${API_URL}`, { timeout: 5000 });
+      console.log("Backend response:", response.data);
+      setBackendStatus({
+        connected: true,
+        message: "Kết nối backend thành công!",
+        data: response.data
+      });
+      toast.success("Kết nối backend thành công!");
+    } catch (error) {
+      console.error("Lỗi kết nối backend:", error);
+      setBackendStatus({
+        connected: false,
+        message: error.message || "Lỗi kết nối không xác định",
+        error
+      });
+      toast.error(`Không thể kết nối backend: ${error.message}`);
+    }
+  };
+
+  // Thêm useEffect để kiểm tra kết nối khi component mount
+  useEffect(() => {
+    testBackendConnection();
+  }, []);
 
   const onSubmit = async(data) => {
     try {
@@ -116,6 +144,23 @@ const Login = () => {
                 </p>
               </div>
             </form>
+            
+            {/* Thêm vào cuối form, trước thẻ đóng form */}
+            <div className="text-center mt-4 text-xs">
+              <button
+                type="button"
+                onClick={testBackendConnection}
+                className="text-gray-400 hover:text-gray-300"
+              >
+                Kiểm tra kết nối backend
+              </button>
+              
+              {backendStatus && (
+                <div className={`text-xs mt-2 ${backendStatus.connected ? 'text-green-500' : 'text-red-500'}`}>
+                  {backendStatus.message}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

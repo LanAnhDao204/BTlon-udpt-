@@ -17,14 +17,18 @@ const AdminLayout = () => {
         let userId = auth?.user?.id;
         // Nếu context mất user, lấy lại từ localStorage
         if (!userId) {
+          console.log("No user ID in context, checking localStorage");
           const userInfo = localStorage.getItem("User");
           if (userInfo) {
-            const user = JSON.parse(userInfo);
-            userId = user?.id;
+            try {
+              const user = JSON.parse(userInfo);
+              userId = user?.id;
+              console.log("User ID from localStorage:", userId);
+            } catch (e) {
+              console.error("Error parsing user from localStorage:", e);
+            }
           }
         }
-        
-        console.log("Checking admin access with userId:", userId); // Debug log
         
         if (!userId) {
           console.log("No userId found, redirecting to login");
@@ -32,10 +36,19 @@ const AdminLayout = () => {
           return;
         }
 
+        // Tạo config cho request với timeout dài hơn
+        const axiosConfig = {
+          timeout: 10000,  // 10 seconds
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        };
+
         // Kiểm tra quyền admin
         console.log("Fetching profile from:", `${API_URL}/user/profile/${userId}`);
-        const response = await axios.get(`${API_URL}/user/profile/${userId}`);
+        const response = await axios.get(`${API_URL}/user/profile/${userId}`, axiosConfig);
         console.log("User profile response:", response.data);
+        
         const userRole = response.data.role;
         
         if (userRole && userRole.toLowerCase() === 'admin') {
@@ -48,6 +61,14 @@ const AdminLayout = () => {
         }
       } catch (error) {
         console.error('Error checking admin status:', error);
+        if (error.response) {
+          console.error('Response error data:', error.response.data);
+          console.error('Response error status:', error.response.status);
+        } else if (error.request) {
+          console.error('Request made but no response received');
+        } else {
+          console.error('Error message:', error.message);
+        }
         toast.error("Lỗi khi kiểm tra quyền admin");
         navigate('/');
       } finally {
