@@ -16,14 +16,16 @@ import AdminLayout from './Components/Admin/AdminLayout';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import AdminUsers from './Components/Admin/AdminUsers';
 import AdminBooks from './Components/Admin/AdminBooks';
+import DebugAdmin from './Components/Admin/DebugAdmin';
 
 
 export default function App() {
-  const [auth] = useAuth()
+  const [auth] = useAuth();
+  console.log("Current auth state:", auth); // Thêm log để debug
 
   return (
     <>
-      <div className="dark:bg-slate-900 dark-text-white">
+      <div className="dark:bg-slate-900 dark:text-white">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route
@@ -41,11 +43,12 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/search" element={<SearchResults />} />
 
-          {/* Admin Routes */}
-          <Route path="admin" element={<AdminLayout />}>
+          {/* Admin Routes - đảm bảo không phụ thuộc vào auth từ context */}
+          <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="books" element={<AdminBooks />} />
+            <Route path="debug" element={<DebugAdmin />} /> {/* Thêm route debug */}
           </Route>
         </Routes>
         <Toaster />

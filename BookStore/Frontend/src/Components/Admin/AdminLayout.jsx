@@ -23,23 +23,32 @@ const AdminLayout = () => {
             userId = user?.id;
           }
         }
+        
+        console.log("Checking admin access with userId:", userId); // Debug log
+        
         if (!userId) {
+          console.log("No userId found, redirecting to login");
           navigate('/login');
           return;
         }
 
         // Kiểm tra quyền admin
+        console.log("Fetching profile from:", `${API_URL}/user/profile/${userId}`);
         const response = await axios.get(`${API_URL}/user/profile/${userId}`);
+        console.log("User profile response:", response.data);
         const userRole = response.data.role;
         
         if (userRole && userRole.toLowerCase() === 'admin') {
+          console.log("Admin role confirmed");
           setIsAdmin(true);
         } else {
+          console.log("Not admin, role:", userRole);
           toast.error("Bạn không có quyền truy cập trang admin");
           navigate('/');
         }
       } catch (error) {
         console.error('Error checking admin status:', error);
+        toast.error("Lỗi khi kiểm tra quyền admin");
         navigate('/');
       } finally {
         setLoading(false);
