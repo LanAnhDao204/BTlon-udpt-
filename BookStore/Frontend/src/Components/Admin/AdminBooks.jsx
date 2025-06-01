@@ -186,32 +186,12 @@ const AdminBooks = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Quản lý sách</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              axios.post(`${API_URL}/admin/seed-books`)
-                .then(() => toast.success('Cập nhật file sampleBooks.js thành công'))
-                .catch(err => toast.error('Lỗi khi cập nhật file sampleBooks.js'));
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          >
-            Cập nhật file sampleBooks
-          </button>
-          <button
-            onClick={() => {
-              setShowSyncConfirm(true);
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-          >
-            Đồng bộ lên Neo4j
-          </button>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
-          >
-            {showForm ? 'Đóng form' : 'Thêm sách mới'}
-          </button>
-        </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
+        >
+          {showForm ? 'Đóng form' : 'Thêm sách mới'}
+        </button>
       </div>
 
       {showForm && (
