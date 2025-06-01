@@ -27,11 +27,7 @@ const Footer = () => {
                 </footer>
                 <footer className="footer text-base-content border-base-300 border-t py-4  dark:bg-slate-900 dark:text-white flex justify-center">
                     <div>
-                        <p>
-                        Made with ❤️ by <a href="https://shivpathk-portfolio.netlify.app/" target="_blank"
-                        className="cursor-pointer text-pink-500 hover:text-pink-700 font-semibold" 
-                        >Shivpathk</a>
-                        </p>
+                        
                     </div>
                 </footer>
             </div>
